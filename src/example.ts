@@ -50,80 +50,69 @@ window.addEventListener("load",
         sublyric: '[by:Tsumugi-mio]\n[00:24.23]\n[00:35.07]呐呐 鼓膜 快要融化的感觉\n[00:39.73]指尖 前面 是那光芒的体温\n[00:45.13]现在 的我 还未曾知晓\n[00:51.00]我即将要忘记 那遥远的时光\n[00:55.50]总有一天你也 将会褪去颜色\n[01:00.96]「但是现在的我还 没有 忘记哟」\n[01:07.44]回转的 回转的 这个世界将我全然无视\n[01:09.71]就像什么都不知道一样\n[01:12.78]悄悄地\n[01:15.10]我的心生锈\n[01:18.16]「会守护你的」\n[01:23.44]这句话已经说不出口\n[01:25.92]谁也不会相信\n[01:28.96]悄悄地\n[01:31.30]像雨一样融化掉\n[01:34.33]像这样不可能的事情 我是说不出口的\n[01:45.19]啊啊 扎破 鼓膜的赤红颜色\n[01:49.52]头脑里面 就像要溶化了一样\n[01:54.90]这样的我 再一次变得「听不见了」\n[02:01.35]回转的 回转的 这个世界将我全然无视\n[02:03.65]就像什么都不知道一样\n[02:06.73]悄悄地\n[02:09.06]让我的心最后的跳动生锈\n[02:12.06]你的事情已经像开始就不存在一般消失掉了啊\n[02:33.74]暧昧的回答 那才是谎话\n[02:39.09]你做出的大致都\n[02:44.49]是反对的神情呢\n[02:49.98]- - - - - - - -\n[03:22.32]回转的 回转的 这个世界将我全然无视\n[03:24.57]就像什么都不知道一样\n[03:27.60]悄悄地\n[03:29.92]使我的心生锈\n[03:32.93]「会守护你的」\n[03:38.55]这句话已经说不出口\n[03:40.78]快要坏掉 快要坏掉的\n[03:43.77]谁也不知道 悄悄地\n[03:46.11]像雨一样融化掉 消失不见\n[03:49.20]之类的像这样不可能的事情 说不出口\n[03:54.64]啊啊\n[03:55.81]回转着\n[03:56.33]回转着\n[03:56.96]回转回转着\n[03:58.26]回转着回转着回转着\n[04:00.95]终末时遗留下的头晕\n[04:04.67]啊啊 啊啊 啊啊 啊啊\n',
         album: 'TEXT'
       },
-      {
-        src: require('./example/music-3.mp3'),
-        poster: require('./example/music-3.jpg'),
-        name: 'In my room',
-        artist: 'FELT',
-        album: 'Grow Color'
-      },
-      {
-        src: require('./example/video-1.mp4'),
-        poster: require('./example/video-1.png'),
-        name: 'ボーカロイドたちがただﾃｯﾃｰﾃﾚｯﾃｰするだけ',
-        type: 'video'
-      }
+      // {
+      //   src: require('./example/music-3.mp3'),
+      //   poster: require('./example/music-3.jpg'),
+      //   name: 'In my room',
+      //   artist: 'FELT',
+      //   album: 'Grow Color'
+      // },
+      // {
+      //   src: require('./example/video-1.mp4'),
+      //   poster: require('./example/video-1.png'),
+      //   name: 'ボーカロイドたちがただﾃｯﾃｰﾃﾚｯﾃｰするだけ',
+      //   type: 'video'
+      // }
     ];
 
     const options = {
       zoomOutKana: true,
       volume: 0.75,
-      dropDownMenuMode: 'bottom'
+      dropDownMenuMode: 'top'
     };
 
     let players = [ new cplayer({
       ...options,
-      playlist,
-      element: document.getElementById('app1'),
-      shadowDom: false
-    }), new cplayer({
-      ...options,
-      playlist: playlist.push(playlist.shift()) && playlist,
-      element: document.getElementById('app2'),
-      dark: true
-    }), new cplayer({
-      ...options,
       playlist: playlist.push(playlist.shift()) && playlist,
       element: document.getElementById('app3'),
       big: true
-    }), new cplayer({
+    }),new cplayer({
       ...options,
       playlist: playlist.push(playlist.shift()) && playlist,
       element: document.getElementById('app4'),
-      big: true,
-      dark: true
+      big: true
     })];
 
     (window as any).cplayerView = cplayerView;
 
-    document.getElementById('add163').addEventListener("click", () => {
-      let id163 = prompt('输入音乐的网易云ID:', '').trim();
-      if (id163) {
-        from163(id163).then(audio => {
-          players.forEach(player => {
-            player.view.showPlaylist();
-            setTimeout(() => {
-              player.add(audio);
-            }, 500);
-          })
-        })
-      }
-    });
+    // document.getElementById('add163').addEventListener("click", () => {
+    //   let id163 = prompt('输入音乐的网易云ID:', '').trim();
+    //   if (id163) {
+    //     from163(id163).then(audio => {
+    //       players.forEach(player => {
+    //         player.view.showPlaylist();
+    //         setTimeout(() => {
+    //           player.add(audio);
+    //         }, 500);
+    //       })
+    //     })
+    //   }
+    // });
 
-    document.getElementById('openplaylist').addEventListener("click", (e) => {
-      players.forEach(player => player.view.showPlaylist());
-    });
+    // document.getElementById('openplaylist').addEventListener("click", (e) => {
+    //   players.forEach(player => player.view.showPlaylist());
+    // });
 
-    document.getElementById('closeplaylist').addEventListener("click", (e) => {
-      players.forEach(player => player.view.showInfo());
-    });
+    // document.getElementById('closeplaylist').addEventListener("click", (e) => {
+    //   players.forEach(player => player.view.showInfo());
+    // });
 
-    document.getElementById('remove').addEventListener("click", (e) => {
-      players.forEach(player => player.view.showPlaylist());
-      setTimeout(() => {
-        players.forEach(player => player.remove(player.playlist[player.playlist.length - 1]));
-      }, 600)
-    });
+    // document.getElementById('remove').addEventListener("click", (e) => {
+    //   players.forEach(player => player.view.showPlaylist());
+    //   setTimeout(() => {
+    //     players.forEach(player => player.remove(player.playlist[player.playlist.length - 1]));
+    //   }, 600)
+    // });
 
     players[0].on('ended', () =>{
       console.log('Event: ended');

@@ -50,8 +50,8 @@ $enable-transitions: true;
     100% {pointer-events: auto;}
 }
 
-$mainbody-height: toem(50px);
-$mainbody-width: toem(300px);
+$mainbody-height: 50px;
+$mainbody-width: 300px;
 $big-progress-height: toem(35px);
 $border-radius: toem(4px);
 
@@ -60,9 +60,10 @@ c-player {
     flex-direction: column;
     position: relative;
     font-size: $base-font-size;
-    width: 300px;
+    width: $mainbody-width;
     text-align: left;
 	.#{$name-prefix}mainbody {
+        margin: 5px 10px;
         display: flex;
         align-items: center;
         flex-direction: row;
@@ -86,7 +87,7 @@ c-player {
     .#{$name-prefix}drop-down-menu {
         $lineheight: 25px;
         $margin: 2px;
-        margin: toem(0px) toem($margin) 0;
+        // margin: toem(0px) toem($margin) 0;
         display: block;
         text-align: center;
         font-size: toem(12px);
@@ -113,6 +114,7 @@ c-player {
         }
         &.#{$name-prefix}drop-down-menu-top {
             order: -1;
+            
         }
         &.#{$name-prefix}drop-down-menu-none {
             display: none;
@@ -163,18 +165,19 @@ c-player {
         height: $mainbody-height;
         pointer-events: auto;
         .#{$name-prefix}controls {
-            opacity: 0;
+            opacity: 1;
         }
-        &:hover {
-            .#{$name-prefix}controls {
-                opacity: 1;
-                animation: miss-pointer-event 100ms;
-                animation-fill-mode: both;
-            }
-            .#{$name-prefix}lyric {
-                opacity: 0;
-            }
-        }
+        
+        // &:hover {
+        //     .#{$name-prefix}controls {
+        //         opacity: 1;
+        //         animation: miss-pointer-event 100ms;
+        //         animation-fill-mode: both;
+        //     }
+        //     .#{$name-prefix}lyric {
+        //         opacity: 0;
+        //     }
+        // }
     }
     .#{$name-prefix}controls {
         display: flex;
@@ -195,13 +198,15 @@ c-player {
         $margin-top: toem(5px);
         display: flex;
         align-items: center;
-        position: absolute;
+        position: relative;
         width: calc(100% - #{$margin-left * 2});
-        height: calc(100% - #{$margin-top * 2});
+        height: $mainbody-width;
+        // height: calc(100% - #{$margin-top * 2});
+        // height:toem(300px);
         overflow: hidden;
         margin: $margin-top $margin-left;
         font-size: toem(14px);
-        @include transition(opacity 0.25s ease);
+
     }
     .#{$name-prefix}lyric-text {
         flex-grow: 1;
@@ -211,7 +216,8 @@ c-player {
         .#{$name-prefix}lyric-text-sub {
             display: block;
             color: $accentColor;
-            font-size: toem(12px, 14px);
+            font-size: toem(10px);
+            font-weight: 550;
         }
         .#{$name-prefix}lyric-text-zoomout {
             font-size: toem(12px);
@@ -219,7 +225,26 @@ c-player {
             display: inline-block;
             margin: 0px toem(2px, 14px);
         }
+        .#{$name-prefix}lyric-smalltext-sub {
+            display: block;
+            color: $accentLightColor;
+            font-size: toem(8px);
+        }
+        .#{$name-prefix}lyric-text {
+            display: block;
+            color: $accentColor;
+            font-size: 12pt;
+            font-weight: 550;
+        }
+        .#{$name-prefix}lyric-smalltext {
+            display: block;
+            color: $accentLightColor;
+            font-size: 10pt;
+        }
+        line-height: 2;
+        font-size: 12pt;
     }
+    
     .#{$name-prefix}progress-container {
         flex-basis: 100%;
         margin: toem(0px);
@@ -276,8 +301,9 @@ c-player {
         }
     }
     .#{$name-prefix}poster {
-        width: $mainbody-height;
-        height: $mainbody-height;
+        
+        width: $mainbody-width;
+        height: $mainbody-width;
         background-repeat: repeat;
         background-position: 50% 50%;
         background-size: cover;
@@ -289,15 +315,18 @@ c-player {
         border-top-left-radius: $border-radius;
         border-bottom-left-radius: $border-radius;
         overflow: hidden;
+        @include transition(opacity 3s cubic-bezier(0.01, 1.35, 0.43, 0.88));
+        // animation: 3s ease 1s 1 normal none running opacity;
         video {
             width: 100%;
             height: 100%;
         }
+        opacity:0.1;
     }
     &.#{$name-prefix}big .#{$name-prefix}poster {
         flex-basis: 100%;
         width: $mainbody-width;
-        height: $mainbody-width * 0.5625;
+        height: $mainbody-width;
         border-right: none;
         border-bottom: toem(1px) solid #eee;
         margin: 0;
@@ -610,6 +639,7 @@ c-player.#{$name-prefix}dark {
         .#{$name-prefix}lyric-text-sub {
             color: $dark-accentColor;
         }
+        
     }
     .#{$name-prefix}progress {
         .#{$name-prefix}progress-fill {

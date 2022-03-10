@@ -15,6 +15,15 @@ export class Lyric {
       return p;
     }, undefined)
   }
+  public getPrevLyric(time: number) {
+    time--;
+    return this.items.reduce((p, c) => {
+      if (c.time < time && (!p || p.time < c.time)) {
+        return c;
+      }
+      return p;
+    }, undefined)
+  }
   public getNextLyric(time: number) {
     return this.items.reduce((p, c) => {
       if (c.time > time && (!p || p.time > c.time)) {
@@ -23,6 +32,7 @@ export class Lyric {
       return p;
     }, undefined)
   }
+  
   public toString() {
     return this.raw;
   }

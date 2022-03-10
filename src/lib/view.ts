@@ -34,8 +34,12 @@ function kanaFilter(str: string) {
   return res;
 }
 
-function buildLyric(lyric: string, sublyric?: string, zoomOutKana: boolean = false) {
-  return (zoomOutKana ? kanaFilter(lyric) : lyric) + (sublyric ? `<span class="cp-lyric-text-sub">${sublyric}</span>` : '')
+function buildLyric(lyric: string, sublyric?: string, zoomOutKana: boolean = false, center=false) {
+  if(center){
+    return `<span class="cp-lyric-text">`+(zoomOutKana ? kanaFilter(lyric) : lyric)+`</span>`+  (sublyric ? `<span class="cp-lyric-text-sub">${sublyric}</span>` : '')
+  }else{
+    return `<span class="cp-lyric-smalltext">`+(zoomOutKana ? kanaFilter(lyric) : lyric) +`</span>`+ (sublyric ? `<span class="cp-lyric-smalltext-sub">${sublyric}</span>` : '')
+  }
 }
 
 function secondNumber2TimeStr(secondTime: number) {
@@ -376,6 +380,33 @@ export default class cplayerView extends EventEmitter {
     this.player.addListener('playlistchange', this.handlePlaylistchange);
     this.player.addListener('audioelementchange', this.handleAudioElementChange);
     this.injectPlayListEventListener();
+
+    this.elementLinks.poster.addEventListener('click',this.handlePosterClick);
+    this.elementLinks.lyricContainer.addEventListener('click',this.handlePosterClick);
+  }
+  private handlePosterClick=()=>{
+    if(this.elementLinks.lyricContainer.style.display==undefined){
+      this.elementLinks.lyricContainer.style.setProperty("display",'flex');
+
+    }
+    if(this.elementLinks.lyricContainer.style.display=='none'){
+      this.elementLinks.lyricContainer.style.setProperty("display",'flex');
+      // this.elementLinks.lyricContainer.style.setProperty("animation",'3s ease 1s 1 normal none running opacity');
+      this.elementLinks.lyricContainer.style.setProperty("opacity",'1');
+      // let src= this.elementLinks.poster.style.backgroundImage ;// url("1.jpg")
+      // src=src.split("\"")[1]
+      // this.elementLinks.poster.style.backgroundImage = `linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url("${src}")`;
+      this.elementLinks.poster.style.opacity="0.1";
+    }else if(this.elementLinks.lyricContainer.style.display==''||this.elementLinks.lyricContainer.style.display=='flex'){
+      this.elementLinks.lyricContainer.style.setProperty("display",'none');
+      // this.elementLinks.lyricContainer.style.setProperty("animation",'opacity 0.3s');
+      this.elementLinks.lyricContainer.style.setProperty("opacity",'0');
+      // let src=    this.elementLinks.poster.style.backgroundImage ;// url("1.jpg")
+      // src=src.split("\"")[1]
+      // this.elementLinks.poster.style.backgroundImage= `url("${src}")`;
+      this.elementLinks.poster.style.opacity="1";
+    }
+    
   }
 
   private handlePlaylistchange = () => {
@@ -384,32 +415,38 @@ export default class cplayerView extends EventEmitter {
 
   private updateLyric(playedTime: number = 0) {
     if (!this.player.nowplay) {
-      this.setLyric(null);
+      this.setLyric("");
       return;
     }
 
     if (this.player.nowplay.lyric && typeof this.player.nowplay.lyric !== 'string' && this.player.played) {
       let lyric = this.player.nowplay.lyric.getLyric(playedTime * 1000);
+      let lyricprev=this.player.nowplay.lyric.getPrevLyric(lyric.time);
+          let lyricnext=this.player.nowplay.lyric.getNextLyric(playedTime*1000);
       let nextLyric = this.player.nowplay.lyric.getNextLyric(playedTime * 1000);
       if (lyric) {
-        let sublyric: ILyricItem;
+        let sublyric,sublyricnext,sublyricprev: ILyricItem;
         if (this.player.nowplay.sublyric && typeof this.player.nowplay.sublyric !== 'string') {
           sublyric = this.player.nowplay.sublyric.getLyric(playedTime * 1000);
+          sublyricnext=this.player.nowplay.sublyric.getNextLyric(playedTime * 1000);
+          sublyricprev=this.player.nowplay.sublyric.getPrevLyric(sublyric.time);
+          // let sublyric3=this.player.nowplay.sublyric.getNextLyric(sublyric2.time);
         }
         if (nextLyric) {
           let duration = nextLyric.time - lyric.time;
           let currentTime = playedTime * 1000 - lyric.time;
-          this.setLyric(buildLyric(lyric.word, sublyric ? sublyric.word : undefined, this.options.zoomOutKana), currentTime, duration);
+          
+          this.setLyric(buildLyric(lyricprev.word, sublyricprev ? sublyricprev.word : undefined, this.options.zoomOutKana)+buildLyric(lyric.word, sublyric ? sublyric.word : undefined, this.options.zoomOutKana,true)+buildLyric(lyricnext.word, sublyricnext ? sublyricnext.word : undefined, this.options.zoomOutKana), currentTime, duration);
         } else {
           let duration = this.player.duration - lyric.time;
           let currentTime = playedTime * 1000 - lyric.time;
-          this.setLyric(buildLyric(lyric.word, sublyric ? sublyric.word : undefined, this.options.zoomOutKana), currentTime, duration);
+          this.setLyric(buildLyric(lyricprev.word, sublyricprev ? sublyricprev.word : undefined, this.options.zoomOutKana)+buildLyric(lyric.word, sublyric ? sublyric.word : undefined, this.options.zoomOutKana,true)+buildLyric("","",this.options.zoomOutKana));
         }
       } else {
-        this.setLyric(buildLyric(this.player.nowplay.name, this.player.nowplay.artist, false), playedTime * 1000, nextLyric.time);
+        // this.setLyric(buildLyric(this.player.nowplay.name, this.player.nowplay.artist, false), playedTime * 1000, nextLyric.time);
       }
     } else {
-      this.setLyric(buildLyric(this.player.nowplay.name, this.player.nowplay.artist, false));
+      // this.setLyric(buildLyric(this.player.nowplay.name, this.player.nowplay.artist, false));
     }
   }
 
