@@ -4,6 +4,14 @@
 
 ![](./previews.png)
 
+It's a fork of original project, with UI improved in my favour. The image shown above is a preview for my cPlayer UI. You can fork with my project or the original project to further improve!
+
+> Tip: `Python2` may need for Typescript, instead of `Python3`!
+
+Below are the original `readme.md` which has not been revised or checked!
+
+# cPlayer
+
 A beautiful and clean WEB Music Player by HTML5. [demo here](http://cplayer.js.org/).
 
 # Feature
