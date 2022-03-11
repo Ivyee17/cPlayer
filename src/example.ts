@@ -5,13 +5,13 @@ import cplayerView from "./lib/view";
 require('./neko.css');
 require('highlight.js/styles/ocean.css');
 
-const hljs = require('highlight.js/lib/highlight');
-const javascript = require('highlight.js/lib/languages/javascript');
-const xml = require('highlight.js/lib/languages/xml');
-hljs.registerLanguage('javascript', javascript);
-hljs.registerLanguage('xml', xml);
+// const hljs = require('highlight.js/lib/highlight');
+// const javascript = require('highlight.js/lib/languages/javascript');
+// const xml = require('highlight.js/lib/languages/xml');
+// hljs.registerLanguage('javascript', javascript);
+// hljs.registerLanguage('xml', xml);
 
-hljs.initHighlightingOnLoad();
+// hljs.initHighlightingOnLoad();
 
 window.addEventListener("load",
   function () {
