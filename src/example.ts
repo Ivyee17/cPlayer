@@ -74,8 +74,7 @@ window.addEventListener("load",
     let players = [ new cplayer({
       ...options,
       playlist: playlist.push(playlist.shift()) && playlist,
-      element: document.getElementById('app3'),
-      big: true
+      element: document.getElementById('app'),
     }),new cplayer({
       ...options,
       playlist: playlist.push(playlist.shift()) && playlist,

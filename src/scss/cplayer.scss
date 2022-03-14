@@ -101,10 +101,11 @@ c-player {
         border-bottom-left-radius: $border-radius;
         @include box_shadow(1);
         @include transition(transform 0.25s ease 0.1s, height 0.25s ease 0.1s);
-        span.#{$name-prefix}audio-title {
-            max-width: toem(170px);
-            overflow: hidden;
-            text-overflow: ellipsis;
+        p {
+            // max-width: toem(170px);
+            // overflow: hidden;
+            @include transition(opacity 0.25s ease 0s);
+            margin: 0;
         }
         span.#{$name-prefix}audio-artist {
             opacity: 0.6;

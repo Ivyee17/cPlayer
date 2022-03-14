@@ -15,7 +15,7 @@ function kanaFilter(str: string) {
   const endtag = '</span>';
   let res = '';
   let startflag = false;
-  for(let i = 0; i < str.length; i++) {
+  for (let i = 0; i < str.length; i++) {
     let ch = str.charAt(i);
     let kano = /[ぁ-んァ-ン]/.test(ch);
     if (kano && !startflag) {
@@ -34,11 +34,11 @@ function kanaFilter(str: string) {
   return res;
 }
 
-function buildLyric(lyric: string, sublyric?: string, zoomOutKana: boolean = false, center=false) {
-  if(center){
-    return `<span class="cp-lyric-text">`+(zoomOutKana ? kanaFilter(lyric) : lyric)+`</span>`+  (sublyric ? `<span class="cp-lyric-text-sub">${sublyric}</span>` : '')
-  }else{
-    return `<span class="cp-lyric-smalltext">`+(zoomOutKana ? kanaFilter(lyric) : lyric) +`</span>`+ (sublyric ? `<span class="cp-lyric-smalltext-sub">${sublyric}</span>` : '')
+function buildLyric(lyric: string, sublyric?: string, zoomOutKana: boolean = false, center = false) {
+  if (center) {
+    return `<span class="cp-lyric-text">` + (zoomOutKana ? kanaFilter(lyric) : lyric) + `</span>` + (sublyric ? `<span class="cp-lyric-text-sub">${sublyric}</span>` : '')
+  } else {
+    return `<span class="cp-lyric-smalltext">` + (zoomOutKana ? kanaFilter(lyric) : lyric) + `</span>` + (sublyric ? `<span class="cp-lyric-smalltext-sub">${sublyric}</span>` : '')
   }
 }
 
@@ -75,7 +75,8 @@ const defaultOption: ICplayerViewOption = {
   width: '',
   size: '12px',
   style: '',
-  shadowDom: true
+  shadowDom: true,
+  big: true,
 }
 
 
@@ -228,6 +229,7 @@ export default class cplayerView extends EventEmitter {
       volumeControllerContainer: gebc('cp-volume-container') as HTMLElement,
       dropDownMenu: gebc('cp-drop-down-menu') as HTMLElement,
       playlist: gebc('cp-playlist') as HTMLElement,
+      playlistGuide: (this.rootElement.getElementsByClassName('cp-drop-down-menu')[0]).getElementsByTagName('p')[0] as HTMLElement,
       playlistItems: this.getPlayListLinks(rootElement)
     }
   }
@@ -267,14 +269,25 @@ export default class cplayerView extends EventEmitter {
   }
 
   public showInfo() {
+
     let dropDownMenu = this.elementLinks.dropDownMenu;
     dropDownMenu.style.height = '';
     dropDownMenu.classList.remove('cp-drop-down-menu-playlist');
     dropDownMenu.classList.add('cp-drop-down-menu-info');
+
     this.dropDownMenuShowInfo = true;
+
+    this.elementLinks.playlistGuide.style.opacity = '1';
+    setTimeout(() => {
+      this.elementLinks.playlistGuide.style.display = '';
+    }, 250);
   }
 
   public showPlaylist() {
+    this.elementLinks.playlistGuide.style.opacity = '0';
+    setTimeout(() => {
+      this.elementLinks.playlistGuide.style.display = 'none';
+    }, 250); // same as the opacity transition length
     let dropDownMenu = this.elementLinks.dropDownMenu;
     dropDownMenu.style.height = this.player.playlist.length * 2.08333 + 'em';
     dropDownMenu.classList.remove('cp-drop-down-menu-info');
@@ -329,7 +342,7 @@ export default class cplayerView extends EventEmitter {
     }
   }
 
-  private updatePlaylist() {
+  public updatePlaylist() {
     var lis = this.player.playlist.map((audio, index) => {
       var element = document.createElement('li');
       element.innerHTML = `
@@ -350,7 +363,7 @@ export default class cplayerView extends EventEmitter {
   }
 
   private injectPlayListEventListener() {
-    Array.prototype.forEach.call(this.elementLinks.playlistItems,((i: Element, index: number) => {
+    Array.prototype.forEach.call(this.elementLinks.playlistItems, ((i: Element, index: number) => {
       i.addEventListener('click', (event) => {
         this.handleClickPlayList(index, event);
       })
@@ -366,11 +379,11 @@ export default class cplayerView extends EventEmitter {
     this.elementLinks.button.mode.addEventListener('click', this.handleClickModeButton);
     this.elementLinks.volumeController.addEventListener('mousemove', this.handleMouseVolumeController)
     this.elementLinks.volumeController.addEventListener('mousedown', this.handleMouseVolumeController)
-    this.elementLinks.volumeController.addEventListener('touchmove', this.handleTouchVolumeController, {passive: true} as any)
+    this.elementLinks.volumeController.addEventListener('touchmove', this.handleTouchVolumeController, { passive: true } as any)
 
     this.elementLinks.progress.addEventListener('mousemove', this.handleMouseProgress)
     this.elementLinks.progress.addEventListener('mousedown', this.handleMouseProgress)
-    this.elementLinks.progress.addEventListener('touchmove', this.handleTouchProgress, {passive: true} as any)
+    this.elementLinks.progress.addEventListener('touchmove', this.handleTouchProgress, { passive: true } as any)
 
     this.player.addListener('playstatechange', this.handlePlayStateChange);
     this.player.addListener('timeupdate', this.handleTimeUpdate);
@@ -381,32 +394,43 @@ export default class cplayerView extends EventEmitter {
     this.player.addListener('audioelementchange', this.handleAudioElementChange);
     this.injectPlayListEventListener();
 
-    this.elementLinks.poster.addEventListener('click',this.handlePosterClick);
-    this.elementLinks.lyricContainer.addEventListener('click',this.handlePosterClick);
+    this.elementLinks.playlistGuide.addEventListener('click', this.handleShowPlaylist);
+
+    this.elementLinks.poster.addEventListener('click', this.handlePosterClick);
+    this.elementLinks.lyricContainer.addEventListener('click', this.handlePosterClick);
   }
-  private handlePosterClick=()=>{
-    if(this.elementLinks.lyricContainer.style.display==undefined){
-      this.elementLinks.lyricContainer.style.setProperty("display",'flex');
+
+  public handleShowPlaylist = () => {
+    this.showPlaylist()
+    // let dropDownMenu = _this.elementLinks.dropDownMenu;
+    // dropDownMenu.style.height = _this.player.playlist.length * 2.08333 + 'em';
+    // dropDownMenu.classList.remove('cp-drop-down-menu-info');
+    // dropDownMenu.classList.add('cp-drop-down-menu-playlist');
+    // _this.dropDownMenuShowInfo = false;
+  }
+  private handlePosterClick = () => {
+    if (this.elementLinks.lyricContainer.style.display == undefined) {
+      this.elementLinks.lyricContainer.style.setProperty("display", 'flex');
 
     }
-    if(this.elementLinks.lyricContainer.style.display=='none'){
-      this.elementLinks.lyricContainer.style.setProperty("display",'flex');
+    if (this.elementLinks.lyricContainer.style.display == 'none') {
+      this.elementLinks.lyricContainer.style.setProperty("display", 'flex');
       // this.elementLinks.lyricContainer.style.setProperty("animation",'3s ease 1s 1 normal none running opacity');
-      this.elementLinks.lyricContainer.style.setProperty("opacity",'1');
+      this.elementLinks.lyricContainer.style.setProperty("opacity", '1');
       // let src= this.elementLinks.poster.style.backgroundImage ;// url("1.jpg")
       // src=src.split("\"")[1]
       // this.elementLinks.poster.style.backgroundImage = `linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url("${src}")`;
-      this.elementLinks.poster.style.opacity="0.1";
-    }else if(this.elementLinks.lyricContainer.style.display==''||this.elementLinks.lyricContainer.style.display=='flex'){
-      this.elementLinks.lyricContainer.style.setProperty("display",'none');
+      this.elementLinks.poster.style.opacity = "0.1";
+    } else if (this.elementLinks.lyricContainer.style.display == '' || this.elementLinks.lyricContainer.style.display == 'flex') {
+      this.elementLinks.lyricContainer.style.setProperty("display", 'none');
       // this.elementLinks.lyricContainer.style.setProperty("animation",'opacity 0.3s');
-      this.elementLinks.lyricContainer.style.setProperty("opacity",'0');
+      this.elementLinks.lyricContainer.style.setProperty("opacity", '0');
       // let src=    this.elementLinks.poster.style.backgroundImage ;// url("1.jpg")
       // src=src.split("\"")[1]
       // this.elementLinks.poster.style.backgroundImage= `url("${src}")`;
-      this.elementLinks.poster.style.opacity="1";
+      this.elementLinks.poster.style.opacity = "1";
     }
-    
+
   }
 
   private handlePlaylistchange = () => {
@@ -421,26 +445,26 @@ export default class cplayerView extends EventEmitter {
 
     if (this.player.nowplay.lyric && typeof this.player.nowplay.lyric !== 'string' && this.player.played) {
       let lyric = this.player.nowplay.lyric.getLyric(playedTime * 1000);
-      let lyricprev=this.player.nowplay.lyric.getPrevLyric(lyric.time);
-          let lyricnext=this.player.nowplay.lyric.getNextLyric(playedTime*1000);
+      let lyricprev = this.player.nowplay.lyric.getPrevLyric(lyric.time);
+      let lyricnext = this.player.nowplay.lyric.getNextLyric(playedTime * 1000);
       let nextLyric = this.player.nowplay.lyric.getNextLyric(playedTime * 1000);
       if (lyric) {
-        let sublyric,sublyricnext,sublyricprev: ILyricItem;
+        let sublyric, sublyricnext, sublyricprev: ILyricItem;
         if (this.player.nowplay.sublyric && typeof this.player.nowplay.sublyric !== 'string') {
           sublyric = this.player.nowplay.sublyric.getLyric(playedTime * 1000);
-          sublyricnext=this.player.nowplay.sublyric.getNextLyric(playedTime * 1000);
-          sublyricprev=this.player.nowplay.sublyric.getPrevLyric(sublyric.time);
+          sublyricnext = this.player.nowplay.sublyric.getNextLyric(playedTime * 1000);
+          sublyricprev = this.player.nowplay.sublyric.getPrevLyric(sublyric.time);
           // let sublyric3=this.player.nowplay.sublyric.getNextLyric(sublyric2.time);
         }
         if (nextLyric) {
           let duration = nextLyric.time - lyric.time;
           let currentTime = playedTime * 1000 - lyric.time;
-          
-          this.setLyric(buildLyric(lyricprev.word, sublyricprev ? sublyricprev.word : undefined, this.options.zoomOutKana)+buildLyric(lyric.word, sublyric ? sublyric.word : undefined, this.options.zoomOutKana,true)+buildLyric(lyricnext.word, sublyricnext ? sublyricnext.word : undefined, this.options.zoomOutKana), currentTime, duration);
+
+          this.setLyric(buildLyric(lyricprev.word, sublyricprev ? sublyricprev.word : undefined, this.options.zoomOutKana) + buildLyric(lyric.word, sublyric ? sublyric.word : undefined, this.options.zoomOutKana, true) + buildLyric(lyricnext.word, sublyricnext ? sublyricnext.word : undefined, this.options.zoomOutKana), currentTime, duration);
         } else {
           let duration = this.player.duration - lyric.time;
           let currentTime = playedTime * 1000 - lyric.time;
-          this.setLyric(buildLyric(lyricprev.word, sublyricprev ? sublyricprev.word : undefined, this.options.zoomOutKana)+buildLyric(lyric.word, sublyric ? sublyric.word : undefined, this.options.zoomOutKana,true)+buildLyric("","",this.options.zoomOutKana));
+          this.setLyric(buildLyric(lyricprev.word, sublyricprev ? sublyricprev.word : undefined, this.options.zoomOutKana) + buildLyric(lyric.word, sublyric ? sublyric.word : undefined, this.options.zoomOutKana, true) + buildLyric("", "", this.options.zoomOutKana));
         }
       } else {
         // this.setLyric(buildLyric(this.player.nowplay.name, this.player.nowplay.artist, false), playedTime * 1000, nextLyric.time);
@@ -459,7 +483,7 @@ export default class cplayerView extends EventEmitter {
   }
 
   private handleClickPlayList = (point: number, event: Event) => {
-    if (this.player.nowplaypoint !== point){
+    if (this.player.nowplaypoint !== point) {
       this.player.to(point);
       this.player.play();
     }
@@ -479,7 +503,7 @@ export default class cplayerView extends EventEmitter {
     } else {
       this.setPoster('none');
     }
-    this.setProgress(0,0,0);
+    this.setProgress(0, 0, 0);
     this.elementLinks.title.innerText = audio.name;
     this.elementLinks.artist.innerText = audio.artist || '';
     this.updateLyric();
