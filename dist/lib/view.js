@@ -53,7 +53,8 @@ const defaultOption = {
     width: '',
     size: '12px',
     style: '',
-    shadowDom: true
+    shadowDom: true,
+    big: true,
 };
 function createStyleElement(style) {
     const styleElement = document.createElement('style');
@@ -85,10 +86,13 @@ function createBeforeShadowElement(targetElement, htmlTemplate, style) {
     return shadowRoot.firstChild;
 }
 function createElement(targetElement, htmlTemplate, style) {
-    targetElement.innerHTML = htmlTemplate;
+    if (targetElement != null)
+        targetElement.innerHTML = htmlTemplate;
     if (!document.getElementById('cplayer-style')) {
         document.body.appendChild(createStyleElement(style));
     }
+    if (targetElement == null)
+        return null;
     return targetElement.firstChild;
 }
 class cplayerView extends events_1.EventEmitter {
@@ -99,6 +103,14 @@ class cplayerView extends events_1.EventEmitter {
         this.__OldVolume = 1;
         this.__OldLyric = '';
         this.__OldTotalTime = 0;
+        this.handleShowPlaylist = () => {
+            this.showPlaylist();
+            // let dropDownMenu = _this.elementLinks.dropDownMenu;
+            // dropDownMenu.style.height = _this.player.playlist.length * 2.08333 + 'em';
+            // dropDownMenu.classList.remove('cp-drop-down-menu-info');
+            // dropDownMenu.classList.add('cp-drop-down-menu-playlist');
+            // _this.dropDownMenuShowInfo = false;
+        };
         this.handlePosterClick = () => {
             if (this.elementLinks.lyricContainer.style.display == undefined) {
                 this.elementLinks.lyricContainer.style.setProperty("display", 'flex');
@@ -212,52 +224,44 @@ class cplayerView extends events_1.EventEmitter {
         this.options = Object.assign(Object.assign({}, defaultOption), options);
         this.player = player;
         if (this.options.generateBeforeElement) {
-            if (this.options.element.createShadowRoot && options.shadowDom !== false) {
-                this.rootElement = createBeforeShadowElement(this.options.element, htmlTemplate, style + this.options.style);
-            }
-            else {
-                this.rootElement = createBeforeElement(this.options.element, htmlTemplate, style + this.options.style);
-            }
+            this.rootElement = createBeforeElement(this.options.element, htmlTemplate, style + this.options.style);
         }
         else {
-            if (this.options.element.createShadowRoot && options.shadowDom !== false) {
-                this.rootElement = createShadowElement(this.options.element, htmlTemplate, style + this.options.style);
-            }
-            else {
-                this.rootElement = createElement(this.options.element, htmlTemplate, style + this.options.style);
-            }
+            this.rootElement = createElement(this.options.element, htmlTemplate, style + this.options.style);
         }
         if (options.deleteElementAfterGenerate) {
             options.element.parentElement.removeChild(options.element);
         }
-        this.rootElement.style.width = this.options.width;
-        this.rootElement.style.fontSize = this.options.size;
-        this.elementLinks = this.getElementLinks();
-        this.injectEventListener();
-        this.setPlayIcon(this.player.paused);
-        this.dropDownMenuShowInfo = !this.options.showPlaylist;
-        if (this.dropDownMenuShowInfo) {
-            this.showInfo();
+        if (this.rootElement) {
+            this.rootElement.style.width = this.options.width;
+            this.rootElement.style.fontSize = this.options.size;
+            this.elementLinks = this.getElementLinks();
+            this.injectEventListener();
+            this.setPlayIcon(this.player.paused);
+            this.dropDownMenuShowInfo = !this.options.showPlaylist;
+            if (this.dropDownMenuShowInfo) {
+                this.showInfo();
+            }
+            else
+                this.showPlaylist();
+            if (!this.options.showPlaylistButton)
+                this.elementLinks.button.list.style.display = 'none';
+            else
+                this.elementLinks.button.list.style.display = '';
+            this.elementLinks.dropDownMenu.classList.add('cp-drop-down-menu-' + this.options.dropDownMenuMode);
+            if (this.options.dark) {
+                this.dark();
+            }
+            if (this.options.big) {
+                this.big();
+            }
+            // this.setPoster(this.player.nowplay.poster || defaultPoster);
+            this.setProgress(this.player.currentTime / this.player.duration, this.player.currentTime, this.player.duration);
+            // this.elementLinks.title.innerText = this.player.nowplay.name;
+            // this.elementLinks.artist.innerText = this.player.nowplay.artist || '';
+            this.updateLyric();
+            this.updatePlaylist();
         }
-        else
-            this.showPlaylist();
-        if (!this.options.showPlaylistButton)
-            this.elementLinks.button.list.style.display = 'none';
-        else
-            this.elementLinks.button.list.style.display = '';
-        this.elementLinks.dropDownMenu.classList.add('cp-drop-down-menu-' + this.options.dropDownMenuMode);
-        if (this.options.dark) {
-            this.dark();
-        }
-        if (this.options.big) {
-            this.big();
-        }
-        // this.setPoster(this.player.nowplay.poster || defaultPoster);
-        this.setProgress(this.player.currentTime / this.player.duration, this.player.currentTime, this.player.duration);
-        // this.elementLinks.title.innerText = this.player.nowplay.name;
-        // this.elementLinks.artist.innerText = this.player.nowplay.artist || '';
-        this.updateLyric();
-        this.updatePlaylist();
     }
     getRootElement() {
         return this.rootElement;
@@ -302,6 +306,7 @@ class cplayerView extends events_1.EventEmitter {
             volumeControllerContainer: gebc('cp-volume-container'),
             dropDownMenu: gebc('cp-drop-down-menu'),
             playlist: gebc('cp-playlist'),
+            playlistGuide: (this.rootElement.getElementsByClassName('cp-drop-down-menu')[0]).getElementsByTagName('p')[0],
             playlistItems: this.getPlayListLinks(rootElement)
         };
     }
@@ -340,8 +345,16 @@ class cplayerView extends events_1.EventEmitter {
         dropDownMenu.classList.remove('cp-drop-down-menu-playlist');
         dropDownMenu.classList.add('cp-drop-down-menu-info');
         this.dropDownMenuShowInfo = true;
+        this.elementLinks.playlistGuide.style.opacity = '1';
+        setTimeout(() => {
+            this.elementLinks.playlistGuide.style.display = '';
+        }, 250);
     }
     showPlaylist() {
+        this.elementLinks.playlistGuide.style.opacity = '0';
+        setTimeout(() => {
+            this.elementLinks.playlistGuide.style.display = 'none';
+        }, 250); // same as the opacity transition length
         let dropDownMenu = this.elementLinks.dropDownMenu;
         dropDownMenu.style.height = this.player.playlist.length * 2.08333 + 'em';
         dropDownMenu.classList.remove('cp-drop-down-menu-info');
@@ -434,6 +447,7 @@ class cplayerView extends events_1.EventEmitter {
         this.player.addListener('playlistchange', this.handlePlaylistchange);
         this.player.addListener('audioelementchange', this.handleAudioElementChange);
         this.injectPlayListEventListener();
+        this.elementLinks.playlistGuide.addEventListener('click', this.handleShowPlaylist);
         this.elementLinks.poster.addEventListener('click', this.handlePosterClick);
         this.elementLinks.lyricContainer.addEventListener('click', this.handlePosterClick);
     }
@@ -452,18 +466,18 @@ class cplayerView extends events_1.EventEmitter {
                 if (this.player.nowplay.sublyric && typeof this.player.nowplay.sublyric !== 'string') {
                     sublyric = this.player.nowplay.sublyric.getLyric(playedTime * 1000);
                     sublyricnext = this.player.nowplay.sublyric.getNextLyric(playedTime * 1000);
-                    sublyricprev = this.player.nowplay.sublyric.getPrevLyric(sublyric.time);
+                    sublyricprev = this.player.nowplay.sublyric.getPrevLyric(sublyric ? sublyric.time : 0);
                     // let sublyric3=this.player.nowplay.sublyric.getNextLyric(sublyric2.time);
                 }
                 if (nextLyric) {
                     let duration = nextLyric.time - lyric.time;
                     let currentTime = playedTime * 1000 - lyric.time;
-                    this.setLyric(buildLyric(lyricprev.word, sublyricprev ? sublyricprev.word : undefined, this.options.zoomOutKana) + buildLyric(lyric.word, sublyric ? sublyric.word : undefined, this.options.zoomOutKana, true) + buildLyric(lyricnext.word, sublyricnext ? sublyricnext.word : undefined, this.options.zoomOutKana), currentTime, duration);
+                    this.setLyric(buildLyric(lyricprev ? lyricprev.word : "", sublyricprev ? sublyricprev.word : undefined, this.options.zoomOutKana) + buildLyric(lyric ? lyric.word : "", sublyric ? sublyric.word : undefined, this.options.zoomOutKana, true) + buildLyric(lyricnext ? lyricnext.word : "", sublyricnext ? sublyricnext.word : undefined, this.options.zoomOutKana), currentTime, duration);
                 }
                 else {
                     let duration = this.player.duration - lyric.time;
                     let currentTime = playedTime * 1000 - lyric.time;
-                    this.setLyric(buildLyric(lyricprev.word, sublyricprev ? sublyricprev.word : undefined, this.options.zoomOutKana) + buildLyric(lyric.word, sublyric ? sublyric.word : undefined, this.options.zoomOutKana, true) + buildLyric("", "", this.options.zoomOutKana));
+                    this.setLyric(buildLyric(lyricprev ? lyricprev.word : "", sublyricprev ? sublyricprev.word : undefined, this.options.zoomOutKana) + buildLyric(lyric ? lyric.word : "", sublyric ? sublyric.word : undefined, this.options.zoomOutKana, true) + buildLyric("", "", this.options.zoomOutKana));
                 }
             }
             else {

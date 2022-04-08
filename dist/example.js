@@ -4,12 +4,12 @@ const lib_1 = require("./lib");
 const view_1 = require("./lib/view");
 require('./neko.css');
 require('highlight.js/styles/ocean.css');
-const hljs = require('highlight.js/lib/highlight');
-const javascript = require('highlight.js/lib/languages/javascript');
-const xml = require('highlight.js/lib/languages/xml');
-hljs.registerLanguage('javascript', javascript);
-hljs.registerLanguage('xml', xml);
-hljs.initHighlightingOnLoad();
+// const hljs = require('highlight.js/lib/highlight');
+// const javascript = require('highlight.js/lib/languages/javascript');
+// const xml = require('highlight.js/lib/languages/xml');
+// hljs.registerLanguage('javascript', javascript);
+// hljs.registerLanguage('xml', xml);
+// hljs.initHighlightingOnLoad();
 window.addEventListener("load", function () {
     function from163(id) {
         if (!id)
@@ -52,7 +52,7 @@ window.addEventListener("load", function () {
         volume: 0.75,
         dropDownMenuMode: 'top'
     };
-    let players = [new lib_1.default(Object.assign(Object.assign({}, options), { playlist: playlist.push(playlist.shift()) && playlist, element: document.getElementById('app3'), big: true })), new lib_1.default(Object.assign(Object.assign({}, options), { playlist: playlist.push(playlist.shift()) && playlist, element: document.getElementById('app4'), big: true }))];
+    let players = [new lib_1.default(Object.assign(Object.assign({}, options), { playlist: playlist.push(playlist.shift()) && playlist, element: document.getElementById('app') })), new lib_1.default(Object.assign(Object.assign({}, options), { playlist: playlist.push(playlist.shift()) && playlist, element: document.getElementById('app4'), big: true }))];
     window.cplayerView = view_1.default;
     // document.getElementById('add163').addEventListener("click", () => {
     //   let id163 = prompt('输入音乐的网易云ID:', '').trim();

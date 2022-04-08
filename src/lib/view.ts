@@ -114,10 +114,12 @@ function createBeforeShadowElement(targetElement: Element, htmlTemplate: string,
 }
 
 function createElement(targetElement: Element, htmlTemplate: string, style: string) {
-  targetElement.innerHTML = htmlTemplate;
+  if (targetElement != null)
+    targetElement.innerHTML = htmlTemplate;
   if (!document.getElementById('cplayer-style')) {
     document.body.appendChild(createStyleElement(style));
   }
+  if (targetElement == null) return null;
   return targetElement.firstChild as HTMLElement;
 }
 
@@ -136,50 +138,50 @@ export default class cplayerView extends EventEmitter {
     };
     this.player = player;
     if (this.options.generateBeforeElement) {
-      if ((this.options.element as any).createShadowRoot && options.shadowDom !== false) {
-        this.rootElement = createBeforeShadowElement(this.options.element, htmlTemplate, style + this.options.style);
-      } else {
-        this.rootElement = createBeforeElement(this.options.element, htmlTemplate, style + this.options.style);
-      }
+
+      this.rootElement = createBeforeElement(this.options.element, htmlTemplate, style + this.options.style);
+
     } else {
-      if ((this.options.element as any).createShadowRoot && options.shadowDom !== false) {
-        this.rootElement = createShadowElement(this.options.element, htmlTemplate, style + this.options.style);
-      } else {
-        this.rootElement = createElement(this.options.element, htmlTemplate, style + this.options.style);
-      }
+
+      this.rootElement = createElement(this.options.element, htmlTemplate, style + this.options.style);
+
     }
     if (options.deleteElementAfterGenerate) {
       options.element.parentElement.removeChild(options.element);
     }
-    this.rootElement.style.width = this.options.width;
-    this.rootElement.style.fontSize = this.options.size;
-    this.elementLinks = this.getElementLinks();
-    this.injectEventListener();
-    this.setPlayIcon(this.player.paused);
-    this.dropDownMenuShowInfo = !this.options.showPlaylist;
-    if (this.dropDownMenuShowInfo) {
-      this.showInfo();
-    } else this.showPlaylist();
-    if (!this.options.showPlaylistButton)
-      this.elementLinks.button.list.style.display = 'none';
-    else
-      this.elementLinks.button.list.style.display = '';
-    this.elementLinks.dropDownMenu.classList.add('cp-drop-down-menu-' + this.options.dropDownMenuMode)
-    if (this.options.dark) {
-      this.dark();
-    }
-    if (this.options.big) {
-      this.big();
-    }
+    if (this.rootElement) {
+      this.rootElement.style.width = this.options.width;
+      this.rootElement.style.fontSize = this.options.size;
 
-    // this.setPoster(this.player.nowplay.poster || defaultPoster);
-    this.setProgress(this.player.currentTime / this.player.duration,
-      this.player.currentTime,
-      this.player.duration);
-    // this.elementLinks.title.innerText = this.player.nowplay.name;
-    // this.elementLinks.artist.innerText = this.player.nowplay.artist || '';
-    this.updateLyric();
-    this.updatePlaylist();
+      this.elementLinks = this.getElementLinks();
+
+      this.injectEventListener();
+      this.setPlayIcon(this.player.paused);
+      this.dropDownMenuShowInfo = !this.options.showPlaylist;
+      if (this.dropDownMenuShowInfo) {
+        this.showInfo();
+      } else this.showPlaylist();
+      if (!this.options.showPlaylistButton)
+        this.elementLinks.button.list.style.display = 'none';
+      else
+        this.elementLinks.button.list.style.display = '';
+      this.elementLinks.dropDownMenu.classList.add('cp-drop-down-menu-' + this.options.dropDownMenuMode)
+      if (this.options.dark) {
+        this.dark();
+      }
+      if (this.options.big) {
+        this.big();
+      }
+
+      // this.setPoster(this.player.nowplay.poster || defaultPoster);
+      this.setProgress(this.player.currentTime / this.player.duration,
+        this.player.currentTime,
+        this.player.duration);
+      // this.elementLinks.title.innerText = this.player.nowplay.name;
+      // this.elementLinks.artist.innerText = this.player.nowplay.artist || '';
+      this.updateLyric();
+      this.updatePlaylist();
+    }
   }
 
   public getRootElement() {
@@ -453,18 +455,18 @@ export default class cplayerView extends EventEmitter {
         if (this.player.nowplay.sublyric && typeof this.player.nowplay.sublyric !== 'string') {
           sublyric = this.player.nowplay.sublyric.getLyric(playedTime * 1000);
           sublyricnext = this.player.nowplay.sublyric.getNextLyric(playedTime * 1000);
-          sublyricprev = this.player.nowplay.sublyric.getPrevLyric(sublyric.time);
+          sublyricprev = this.player.nowplay.sublyric.getPrevLyric(sublyric ? sublyric.time : 0);
           // let sublyric3=this.player.nowplay.sublyric.getNextLyric(sublyric2.time);
         }
         if (nextLyric) {
           let duration = nextLyric.time - lyric.time;
           let currentTime = playedTime * 1000 - lyric.time;
 
-          this.setLyric(buildLyric(lyricprev.word, sublyricprev ? sublyricprev.word : undefined, this.options.zoomOutKana) + buildLyric(lyric.word, sublyric ? sublyric.word : undefined, this.options.zoomOutKana, true) + buildLyric(lyricnext.word, sublyricnext ? sublyricnext.word : undefined, this.options.zoomOutKana), currentTime, duration);
+          this.setLyric(buildLyric(lyricprev ? lyricprev.word : "", sublyricprev ? sublyricprev.word : undefined, this.options.zoomOutKana) + buildLyric(lyric ? lyric.word : "", sublyric ? sublyric.word : undefined, this.options.zoomOutKana, true) + buildLyric(lyricnext ? lyricnext.word : "", sublyricnext ? sublyricnext.word : undefined, this.options.zoomOutKana), currentTime, duration);
         } else {
           let duration = this.player.duration - lyric.time;
           let currentTime = playedTime * 1000 - lyric.time;
-          this.setLyric(buildLyric(lyricprev.word, sublyricprev ? sublyricprev.word : undefined, this.options.zoomOutKana) + buildLyric(lyric.word, sublyric ? sublyric.word : undefined, this.options.zoomOutKana, true) + buildLyric("", "", this.options.zoomOutKana));
+          this.setLyric(buildLyric(lyricprev ? lyricprev.word : "", sublyricprev ? sublyricprev.word : undefined, this.options.zoomOutKana) + buildLyric(lyric ? lyric.word : "", sublyric ? sublyric.word : undefined, this.options.zoomOutKana, true) + buildLyric("", "", this.options.zoomOutKana));
         }
       } else {
         // this.setLyric(buildLyric(this.player.nowplay.name, this.player.nowplay.artist, false), playedTime * 1000, nextLyric.time);

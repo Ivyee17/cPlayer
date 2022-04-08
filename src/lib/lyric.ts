@@ -45,6 +45,7 @@ export class Lyric {
 export function decodeLyricStr(lyricStr: string, options?: {}) {
   if (typeof lyricStr !== 'string') return lyricStr;
   let lyric: ILyricItem[] = [];
+  // lyric.push({time:0,word:""});
   lyricStr.replace(/\n+/gi, "\n").trim().split("\n").forEach((lyricStrItem) => {
     lyric.push(...decodeLyricStrItem(lyricStrItem));
   });
