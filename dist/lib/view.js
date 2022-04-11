@@ -458,30 +458,32 @@ class cplayerView extends events_1.EventEmitter {
         }
         if (this.player.nowplay.lyric && typeof this.player.nowplay.lyric !== 'string' && this.player.played) {
             let lyric = this.player.nowplay.lyric.getLyric(playedTime * 1000);
-            let lyricprev = this.player.nowplay.lyric.getPrevLyric(lyric.time);
-            let lyricnext = this.player.nowplay.lyric.getNextLyric(playedTime * 1000);
-            let nextLyric = this.player.nowplay.lyric.getNextLyric(playedTime * 1000);
-            if (lyric) {
-                let sublyric, sublyricnext, sublyricprev;
-                if (this.player.nowplay.sublyric && typeof this.player.nowplay.sublyric !== 'string') {
-                    sublyric = this.player.nowplay.sublyric.getLyric(playedTime * 1000);
-                    sublyricnext = this.player.nowplay.sublyric.getNextLyric(playedTime * 1000);
-                    sublyricprev = this.player.nowplay.sublyric.getPrevLyric(sublyric ? sublyric.time : 0);
-                    // let sublyric3=this.player.nowplay.sublyric.getNextLyric(sublyric2.time);
-                }
-                if (nextLyric) {
-                    let duration = nextLyric.time - lyric.time;
-                    let currentTime = playedTime * 1000 - lyric.time;
-                    this.setLyric(buildLyric(lyricprev ? lyricprev.word : "", sublyricprev ? sublyricprev.word : undefined, this.options.zoomOutKana) + buildLyric(lyric ? lyric.word : "", sublyric ? sublyric.word : undefined, this.options.zoomOutKana, true) + buildLyric(lyricnext ? lyricnext.word : "", sublyricnext ? sublyricnext.word : undefined, this.options.zoomOutKana), currentTime, duration);
+            if (lyric != undefined) {
+                let lyricprev = this.player.nowplay.lyric.getPrevLyric(lyric.time);
+                let lyricnext = this.player.nowplay.lyric.getNextLyric(playedTime * 1000);
+                let nextLyric = this.player.nowplay.lyric.getNextLyric(playedTime * 1000);
+                if (lyric) {
+                    let sublyric, sublyricnext, sublyricprev;
+                    if (this.player.nowplay.sublyric && typeof this.player.nowplay.sublyric !== 'string') {
+                        sublyric = this.player.nowplay.sublyric.getLyric(playedTime * 1000);
+                        sublyricnext = this.player.nowplay.sublyric.getNextLyric(playedTime * 1000);
+                        sublyricprev = this.player.nowplay.sublyric.getPrevLyric(sublyric ? sublyric.time : 0);
+                        // let sublyric3=this.player.nowplay.sublyric.getNextLyric(sublyric2.time);
+                    }
+                    if (nextLyric) {
+                        let duration = nextLyric.time - lyric.time;
+                        let currentTime = playedTime * 1000 - lyric.time;
+                        this.setLyric(buildLyric(lyricprev ? lyricprev.word : "", sublyricprev ? sublyricprev.word : undefined, this.options.zoomOutKana) + buildLyric(lyric ? lyric.word : "", sublyric ? sublyric.word : undefined, this.options.zoomOutKana, true) + buildLyric(lyricnext ? lyricnext.word : "", sublyricnext ? sublyricnext.word : undefined, this.options.zoomOutKana), currentTime, duration);
+                    }
+                    else {
+                        let duration = this.player.duration - lyric.time;
+                        let currentTime = playedTime * 1000 - lyric.time;
+                        this.setLyric(buildLyric(lyricprev ? lyricprev.word : "", sublyricprev ? sublyricprev.word : undefined, this.options.zoomOutKana) + buildLyric(lyric ? lyric.word : "", sublyric ? sublyric.word : undefined, this.options.zoomOutKana, true) + buildLyric("", "", this.options.zoomOutKana));
+                    }
                 }
                 else {
-                    let duration = this.player.duration - lyric.time;
-                    let currentTime = playedTime * 1000 - lyric.time;
-                    this.setLyric(buildLyric(lyricprev ? lyricprev.word : "", sublyricprev ? sublyricprev.word : undefined, this.options.zoomOutKana) + buildLyric(lyric ? lyric.word : "", sublyric ? sublyric.word : undefined, this.options.zoomOutKana, true) + buildLyric("", "", this.options.zoomOutKana));
+                    // this.setLyric(buildLyric(this.player.nowplay.name, this.player.nowplay.artist, false), playedTime * 1000, nextLyric.time);
                 }
-            }
-            else {
-                // this.setLyric(buildLyric(this.player.nowplay.name, this.player.nowplay.artist, false), playedTime * 1000, nextLyric.time);
             }
         }
         else {

@@ -447,6 +447,7 @@ export default class cplayerView extends EventEmitter {
 
     if (this.player.nowplay.lyric && typeof this.player.nowplay.lyric !== 'string' && this.player.played) {
       let lyric = this.player.nowplay.lyric.getLyric(playedTime * 1000);
+      if(lyric!=undefined){
       let lyricprev = this.player.nowplay.lyric.getPrevLyric(lyric.time);
       let lyricnext = this.player.nowplay.lyric.getNextLyric(playedTime * 1000);
       let nextLyric = this.player.nowplay.lyric.getNextLyric(playedTime * 1000);
@@ -470,7 +471,7 @@ export default class cplayerView extends EventEmitter {
         }
       } else {
         // this.setLyric(buildLyric(this.player.nowplay.name, this.player.nowplay.artist, false), playedTime * 1000, nextLyric.time);
-      }
+      }}
     } else {
       // this.setLyric(buildLyric(this.player.nowplay.name, this.player.nowplay.artist, false));
     }

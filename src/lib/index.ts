@@ -280,6 +280,7 @@ export default class cplayer extends EventEmitter {
     let isPlaying = this.isPlaying();
     let res;
     if (!isPlaying && this.playlist.length > 0 || Forced) {
+      
       res = this.audioElement.play();
     }
     if (this.__paused) {

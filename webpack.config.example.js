@@ -35,9 +35,9 @@ module.exports = {
     plugins: [
         new webpack.DefinePlugin(GLOBALS),
         new HtmlWebpackPlugin(HtmlWebpackConfig),
-        new CopyPlugin([
-            { from: __dirname + '/src/manifest.json', to: 'manifest.json' }
-          ])
+        // new CopyPlugin([
+        //     { from: __dirname + '/src/manifest.json', to: 'manifest.json' }
+        //   ])
     ],
 
     resolve: {
