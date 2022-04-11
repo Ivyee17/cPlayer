@@ -280,7 +280,9 @@ export default class cplayer extends EventEmitter {
     let isPlaying = this.isPlaying();
     let res;
     if (!isPlaying && this.playlist.length > 0 || Forced) {
-      
+      var me=document.createEvent("MouseEvent");
+      me.initMouseEvent("click",true,true,window,0,0,0,0,0,false,false,false,false,0,null);
+      document.getElementsByClassName('cp-play-button')[0].dispatchEvent(me);
       res = this.audioElement.play();
     }
     if (this.__paused) {
